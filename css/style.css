@@ -1,0 +1,5 @@
+.jigsaw{float:left; width:450px; position:relative; z-index:1; border:1px solid #000;}
+.jigsaw>img {float:left; width:150px; height:100px; font-size:3em; color:#fff; background:#ccc; position:absolute; z-index:3;}
+.jigsaw-containers {float:left; width: 100%;}
+.jigsaw-containers>div{float:left;}
+.jigsaw-containers .match{ z-index:2;}

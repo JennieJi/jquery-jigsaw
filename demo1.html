@@ -1,0 +1,108 @@
+<!doctype>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="css/style.css"/>
+</head>
+<body>
+<div class="jigsaw">
+	<img src="img/puzzle1/puzzle_r1_c1.gif" width="150" height="100" alt="Puzzle Piece">
+	<img src="img/puzzle1/puzzle_r1_c2.gif" width="150" height="100" alt="Puzzle Piece">
+	<img src="img/puzzle1/puzzle_r1_c3.gif" width="150" height="100" alt="Puzzle Piece">
+	<img src="img/puzzle1/puzzle_r2_c1.gif" width="150" height="100" alt="Puzzle Piece">
+	<img src="img/puzzle1/puzzle_r2_c2.gif" width="150" height="100" alt="Puzzle Piece">
+	<img src="img/puzzle1/puzzle_r2_c3.gif" width="150" height="100" alt="Puzzle Piece">
+	<img src="img/puzzle1/puzzle_r3_c1.gif" width="150" height="100" alt="Puzzle Piece">
+	<img src="img/puzzle1/puzzle_r3_c2.gif" width="150" height="100" alt="Puzzle Piece">
+	<img src="img/puzzle1/puzzle_r3_c3.gif" width="150" height="100" alt="Puzzle Piece">
+</div>
+<script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="js/jquery-ui-1.8.21.custom.min.js"></script>
+<script type="text/javascript">
+	function jigsaw($jigsaws, options){
+		var defaults = {
+				col: 3
+			},	opts = $.extend(defaults, options);
+
+
+		$jigsaws.each(function(iJigsaw){
+			var $jigsaw = $(this),
+				$imgs = $jigsaw.children();
+			var length = $imgs.length,
+				row = Math.ceil(length/opts.col);
+				width = $imgs.width(),
+				height = $imgs.height();
+			var classMatch = 'match',
+				classReady = 'ready';
+
+			function setPosition( index, $img ){
+				var nowCol = index % opts.col,
+					nowRow = parseInt( index / opts.col );
+				$img.css({
+					'position': 'absolute',
+					'left': nowCol * width,
+					'top': nowRow * height
+				});	
+			}
+
+			function buildContainer () {
+				var builder = '',
+					container = '<div style="width:' + width + 'px;height:' + height + 'px;" />';
+				for( var n = 0; n < length; n++ ) {
+					builder += container;
+				}
+				build = '<div class="jigsaw-containers">' + builder + '</div>';
+				return $(build).appendTo( $jigsaw ).children();
+			}
+
+			function isMatch( $img, order ) {
+				var match = $img.data('order') == order;
+				if( match ) {
+					$img.addClass(classMatch);
+				}
+				return match;
+			}
+
+
+			// Make images draggable
+			$imgs.draggable({
+				containment: ".jigsaw-containers",
+				scroll:false
+			});
+
+			// Handle drop
+			buildContainer().droppable({
+				drop:function( event, ui ){
+					var rightOrder = $(this).index();
+					if( !isMatch(ui.draggable, rightOrder) ){ return; }
+
+					// fix position
+					setPosition( rightOrder, ui.draggable );
+
+					// Check if completed
+					if( ui.draggable.siblings("." + classMatch).length == length-1 ){
+						alert("Congratulations!");
+					}
+				},
+				activate:function( event,ui ){
+					setPosition( $(this).index() , ui.draggable );
+				},
+				out:function( event,ui ){
+					ui.draggable.removeClass(classMatch);
+				}
+			});
+			
+			// Reset positions
+			for( var n = 0; n<length; n++ ){
+				var selectIndex = parseInt( Math.random() * 10 ) % ( length - n );
+				var $selectImg = $imgs.not("." + classReady).eq( selectIndex ).addClass(classReady);
+				$selectImg.data('order', $selectImg.index());
+				isMatch( $selectImg, n );
+				setPosition(n, $selectImg);
+			}
+		});
+	}
+
+	jigsaw( $('.jigsaw') );
+</script>
+</body>
+</html>
